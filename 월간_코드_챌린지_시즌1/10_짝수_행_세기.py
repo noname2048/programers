@@ -16,12 +16,16 @@ def tester_makeer(solution):
 
     return wrapper
 
+"""
 ncr_debug = False
 dp_debug = True
 dv = pow(10, 7) + 19
+"""
 a = [[0,1,0],[1,1,1],[1,1,0],[0,1,1]]
 a = [[1,0,0],[1,0,0]]
 a = [[1,0,0,1,1],[0,0,0,0,0],[1,1,0,0,0],[0,0,0,0,1]]
+a = [[0, 1, 1]]
+"""
 rows = len(a)
 cols = len(a[0])
 
@@ -32,9 +36,10 @@ for c in range(cols):
 
 dp_cache = [[0 for c in range(cols)] for r in range(rows + 1)]
 ncr_cache = [[None for c in range(rows + 1)] for r in range(rows + 1)]
+"""
 
 from collections import deque
-def ncr(cache, n, r):
+def ncr(cache, n, r, dv, ncr_debug=False):
     """ nCr을 구하는 함수.
     (n)C(r) = (n-1)C(r) + (n-1)C(r-1)
 
@@ -80,14 +85,14 @@ def ncr(cache, n, r):
                     print(f"+{n - 1}C{r - 1}") if ncr_debug else None
 
                 if cache[n - 1][r] is not None and cache[n - 1][r - 1] is not None:
-                    cache[n][r] = cache[n - 1][r] + cache[n - 1][r - 1]
+                    cache[n][r] = (cache[n - 1][r] % dv + cache[n - 1][r - 1] % dv) % dv
                     stack.pop()
         else:      
             stack.pop()
     
     return cache[n][r]
 
-
+"""
 # init
 first_even = rows - ones_in_col[0]
 for i in range(rows):
@@ -122,7 +127,7 @@ for here in range(cols - 1):
 
 print(f"ans {dp_cache[rows][cols - 1]}")
 print(f"ans {dp_cache[rows][cols - 1]}")
-
+"""
 
 def solution(a):
 
@@ -141,8 +146,8 @@ def solution(a):
 
     #  result of first column is fixed
     first_even = rows - ones_in_col[0]
-    for i in range(rows):
-        dp_cache[i][0] = ncr(ncr_cache, rows, first_even) if i == first_even else 0
+    for i in range(rows + 1):
+        dp_cache[i][0] = ncr(ncr_cache, rows, first_even, dv) if i == first_even else 0
 
     #  Then, here := 0 ~ cols - 2 (col - 1 is last, so before last)
     for here in range(cols - 1):
@@ -162,9 +167,11 @@ def solution(a):
                     new_even = (even - select_from_even) + select_from_odds
 
                     dp_cache[new_even][next] += (
-                        dp_cache[even][here] * 
-                        ncr(ncr_cache, even, select_from_even) *
-                        ncr(ncr_cache, odds, select_from_odds)
+                        (dp_cache[even][here] % dv) * 
+                        ncr(ncr_cache, even, select_from_even, dv) *
+                        ncr(ncr_cache, odds, select_from_odds, dv)
                     )
                     
     return dp_cache[rows][cols - 1]
+
+print(solution(a))
