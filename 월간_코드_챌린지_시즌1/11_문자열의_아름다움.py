@@ -43,3 +43,44 @@ while j > -1:
 
 print(right_first_diff)
 print(left_first_diff)
+
+def solution7(s):
+    l = len(s)
+    allsum = [[0]*(len(s)+1) for i in range(26)]
+    allcnt = [[0]*(len(s)+1) for i in range(26)]
+    prev = '0'
+    cnt = 0
+    res = 0
+    for i,c in enumerate(s):
+        s = int(i*(i+1)/2)
+        if prev == c:
+            cnt+=1
+        else:
+            prev = c
+            cnt = 1
+        ii = ord(c)-ord('a')
+
+        idx = cnt
+        #print('%d %d %s'%(cnt, s, c))
+
+        while idx:
+            s -= allsum[ii][idx]
+            s += cnt*allcnt[ii][idx]
+            idx -= idx&-idx
+
+        idx = l
+        while idx:
+            s -= cnt*allcnt[ii][idx]
+            idx -= idx&-idx
+
+        #print(s)
+        idx = cnt
+        while idx <= l:
+            allsum[ii][idx]+=cnt
+            allcnt[ii][idx]+=1
+            idx += idx&-idx
+        res += s
+    #print(f'{allsum=}\n{allcnt=}')
+    return res
+
+solution7(s)
